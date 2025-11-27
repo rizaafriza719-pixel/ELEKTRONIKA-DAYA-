@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Monitoring Mesin - Simulasi</title>
+
+  <!-- Canvas Gauges -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-gauges@2.1.7/gauge.min.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      background:#f5f5f5;
+      font-family:Arial, sans-serif;
+      padding:20px;
+      margin:0;
+    }
+    h2 {
+      text-align:center;
+      color:#222;
+      margin-bottom:10px;
+    }
+    .container {
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:25px;
+      max-width:900px;
+      margin:auto;
+    }
+    .gauge-box {
+      background:#fff;
+      padding:15px;
+      border-radius:12px;
+      text-align:center;
+      box-shadow:0 3px 10px rgba(0,0,0,0.12);
+    }
+    .chart-container {
+      width:90%;
+      max-width:900px;
+      background:#fff;
+      margin:25px auto;
+      padding:20px;
+      border-radius:12px;
+      box-shadow:0 3px 10px rgba(0,0,0,0.12);
+    }
+  </style>
+</head>
+<body>
+
+<h2>Monitoring Mesin (Simulasi)</h2>
+<h2>KELOMPOK 04 NIM 007, 019, 061 - 2024i</h2>
+
+<div class="container">
+
+  <!-- SUHU: Hijau -->
+  <div class="gauge-box">
+    <canvas id="gSuhu" data-type="radial-gauge"
+      data-width="220" data-height="220"
+      data-min-value="0" data-max-value="150"
+      data-major-ticks="0,25,50,75,100,125,150"
+      data-units="°C" data-title="Suhu Mesin"
+      data-value="0" data-color-value="#00c851"
+      data-glow="true"></canvas>
+  </div>
+
+  <!-- TEGANGAN: Biru -->
+  <div class="gauge-box">
+    <canvas id="gVolt" data-type="radial-gauge"
+      data-width="220" data-height="220"
+      data-min-value="0" data-max-value="300"
+      data-major-ticks="0,50,100,150,200,250,300"
+      data-units="V" data-title="Tegangan Output"
+      data-value="0" data-color-value="#007bff"
+      data-glow="true"></canvas>
+  </div>
+
+  <!-- RPM: Kuning -->
+  <div class="gauge-box">
+    <canvas id="gRPM" data-type="radial-gauge"
+      data-width="220" data-height="220"
+      data-min-value="0" data-max-value="6000"
+      data-major-ticks="0,1000,2000,3000,4000,5000,6000"
+      data-units="RPM" data-title="Putaran Mesin"
+      data-value="0" data-color-value="#fdd835"
+      data-glow="true"></canvas>
+  </div>
+
+</div>
+
+<!-- ================= GRAFIK ================= -->
+<div class="chart-container">
+  <canvas id="chartSuhu"></canvas>
+</div>
+<div class="chart-container">
+  <canvas id="chartVolt"></canvas>
+</div>
+<div class="chart-container">
+  <canvas id="chartRPM"></canvas>
+</div>
+
+<script>
+window.onload = () => {
+  setTimeout(() => {
+    const g = window.gauges;
+    const gSuhu = g[0];
+    const gVolt = g[1];
+    const gRPM  = g[2];
+
+    const ctxS = document.getElementById('chartSuhu').getContext('2d');
+    const ctxV = document.getElementById('chartVolt').getContext('2d');
+    const ctxR = document.getElementById('chartRPM').getContext('2d');
+
+    const chartSuhu = new Chart(ctxS, {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'Suhu (°C)', data: [], borderWidth: 2, borderColor: '#00c851', backgroundColor:'rgba(0,200,81,0.2)' }] },
+      options:{ responsive:true, animation:false }
+    });
+
+    const chartVolt = new Chart(ctxV, {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'Tegangan (V)', data: [], borderWidth: 2, borderColor: '#007bff', backgroundColor:'rgba(0,123,255,0.2)' }] },
+      options:{ responsive:true, animation:false }
+    });
+
+    const chartRPM = new Chart(ctxR, {
+      type: 'line',
+      data: { labels: [], datasets: [{ label: 'RPM', data: [], borderWidth: 2, borderColor: '#fdd835', backgroundColor:'rgba(253,216,53,0.2)' }] },
+      options:{ responsive:true, animation:false }
+    });
+
+    let time = 0;
+
+    setInterval(() => {
+      let suhu = 60 + Math.random()*50;
+      let volt = 180 + Math.random()*70;
+      let rpm  = 1000 + Math.random()*4000;
+
+      gSuhu.value = suhu;
+      gVolt.value = volt;
+      gRPM.value  = rpm;
+
+      chartSuhu.data.labels.push(time+'s');
+      chartVolt.data.labels.push(time+'s');
+      chartRPM.data.labels.push(time+'s');
+
+      chartSuhu.data.datasets[0].data.push(suhu);
+      chartVolt.data.datasets[0].data.push(volt);
+      chartRPM.data.datasets[0].data.push(rpm);
+
+      if(chartSuhu.data.labels.length > 20){
+        chartSuhu.data.labels.shift(); chartSuhu.data.datasets[0].data.shift();
+        chartVolt.data.labels.shift(); chartVolt.data.datasets[0].data.shift();
+        chartRPM.data.labels.shift(); chartRPM.data.datasets[0].data.shift();
+      }
+
+      chartSuhu.update();
+      chartVolt.update();
+      chartRPM.update();
+
+      time++;
+    },1000);
+
+  },800);
+}
+</script>
+
+</body>
+</html>
